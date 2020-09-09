@@ -7,6 +7,7 @@
  */
 
 import java.lang.String;
+import java.util.Comparator;
 
 public class Process implements Comparable<Process>
 {
@@ -91,6 +92,7 @@ public class Process implements Comparable<Process>
         return output;
     }
 
+    //So far only used for when we use SPN
     @Override
     public int compareTo(Process p)
     {

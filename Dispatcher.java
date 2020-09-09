@@ -7,7 +7,6 @@
  */
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 public class Dispatcher
 {
@@ -43,20 +42,6 @@ public class Dispatcher
         this.preemptive = false;
     }
 
-    //Parameter constructor for loading in the run time and processes from the input file
-    public Dispatcher(int tick, ArrayList<Process> input)
-    {
-        this.runTime = tick;
-        this.input = input;
-        this.running = new ArrayList<>();
-        this.waiting = new ArrayList<>();
-        this.complete = new ArrayList<>();
-        this.timeSlice = 0.0;
-        this.totalTime = 0;
-        //Default mode for dispatcher is non preemptive
-        this.preemptive = false;
-    }
-
     //First Come First Serve Algorithm
     //Preconditions: current Dispatcher object has been declared and initialized
     //Postconditions: Simulates the FCFS algorithm and calculates the necessary time values for each Process object
@@ -75,15 +60,83 @@ public class Dispatcher
         }
     }
 
+    //Preconditions: Dispatcher object has been declared & initialized and FCFS() has been called.
+    //                  if another algorithm was called then call resetDispatcher() then FCFS()
+    //Postconditions: formatted output for the FCFS algorithm is displayed
+    public void outputFCS()
+    {
+        System.out.println("FCFS:");
+        for(Process p : this.getComplete())
+        {
+            System.out.println("T" + p.getStartTime() + ":  " + p.getID() + "(" + p.getPriority() + ")");
+        }
+        System.out.println("\nProcess Turnaround Time Waiting Time");
+        for(Process p : this.getComplete())
+        {
+            //length of the turnaround and waiting time integer
+            String t = Integer.toString(p.getTat());
+            String w = Integer.toString(p.getWaitTime());
+            //number of whitespaces needed to add for turnaround and waiting time
+            int wsT, wsW = 16;
+            if(t.length() == 2)
+            {
+                wsT = 8;
+            }
+            else {wsT = 7;}
+            if(w.length() == 1){wsW = 15;}
+            String output = String.format("%s%" + wsT + "d%" + wsW + "d", p.getID(), p.getTat(), p.getWaitTime());
+            System.out.println(output);
+        }
+    }
+
     //Shortest Process Next Algorithm
     //Preconditions: current Dispatcher object has been declared and initialized, if another algorithm has run previously then resetDispatcher() needs to be called
     //Postconditions: Simulates the SPN algorithm and calculates the necessary time values for each Process object
     public void SPN()
     {
-        //TODO sort by smallest execution/service time
+        //Move all Process objects in input to the waiting queue
         this.moveInput();
-        for(Process p : this.getWaiting())
-        {System.out.println(p);}
+        //Sort waiting based on how long each process takes.
+        //The Process object with the smallest execution time will be at the start and largest at the end
+        this.getWaiting().sort(new ProcessSorter.serviceTimeSort());
+        this.runDispatcher();
+        for(int i = 0; i < this.getInput().size(); i++)
+        {
+            this.moveWaiting();
+            this.runProcess();
+            this.runDispatcher();
+        }
+    }
+
+    public void outputSPN()
+    {
+        System.out.println("\nSPN: ");
+        for(Process p : this.getComplete())
+        {
+            System.out.println("T" + p.getStartTime() + ":  " + p.getID() + "(" + p.getPriority() + ")");
+        }
+        System.out.println("\nProcess Turnaround Time Waiting Time");
+        //Since the ArrayList this.complete is populated by the order in which the processes are ran we need to re sort
+        this.getComplete().sort(new ProcessSorter.IDSort());
+        for(Process p : this.getComplete())
+        {
+            //Get the length of the turnaround time integer
+            String t = Integer.toString(p.getTat());
+            //Get the length of the waiting time integer
+            String w = Integer.toString(p.getWaitTime());
+            //how many whitespaces we need to add for the turnaround time and waiting time
+            int wsT, wsW = 16;
+            //if the turnaround is 2 digits
+            if(t.length() == 2)
+            {
+                wsW = 15;
+                wsT = 8;
+            }
+            else {wsT = 7;}
+            if(w.length() == 2){wsW = 16;}
+            String output = String.format("%s%" + wsT + "d%" + wsW + "d", p.getID(), p.getTat(), p.getWaitTime());
+            System.out.println(output);
+        }
     }
 
     //Preemptive Priority Algorithm
@@ -172,7 +225,6 @@ public class Dispatcher
 
     //Preconditions: Dispatcher object has been declared and initialized
     //Postconditions: Assign the value of comp to complete
-
     public void setComplete(ArrayList<Process> comp) {this.complete = comp;}
 
     //Preconditions: Dispatcher object has been declared and initialized

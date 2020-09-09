@@ -17,7 +17,7 @@ public class A1
         String fileName = args[0];
         ArrayList<Process> input = new ArrayList<>();
         ArrayList<Process> FCFS = new ArrayList<>();
-        //ArrayList<Process> SPN = new ArrayList<>();
+        ArrayList<Process> SPN = new ArrayList<>();
         //ArrayList<Process> PP = new ArrayList<>();
         Dispatcher d = new Dispatcher();
         try
@@ -62,19 +62,12 @@ public class A1
         //Run the first scheduling algorithm
         d.FCFS();
         FCFS = d.getComplete();
-        System.out.println("FCFS:");
-        for(Process p : FCFS)
-        {
-            System.out.println("T" + p.getStartTime() + ":  " + p.getID() + "(" + p.getPriority() + ")");
-        }
-        System.out.println("\nProcess Turnaround Time Waiting Time");
-        for(Process p : FCFS)
-        {
-            String output = String.format("%s        %d               %d", p.getID(), p.getTat(), p.getWaitTime());
-            System.out.println(output);
-        }
+        //Wrap this output in functions
+        d.outputFCS();
         //Reset the dispatcher
         d.resetDispatcher();
         d.SPN();
+        d.outputSPN();
+        d.resetDispatcher();
     }
 }
