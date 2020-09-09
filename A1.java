@@ -18,7 +18,8 @@ public class A1
         ArrayList<Process> input = new ArrayList<>();
         ArrayList<Process> FCFS = new ArrayList<>();
         ArrayList<Process> SPN = new ArrayList<>();
-        //ArrayList<Process> PP = new ArrayList<>();
+        ArrayList<Process> PP = new ArrayList<>();
+        double fcfsAvgT = 0.0, spnAvgT = 0.0, ppAvgT = 0.0, fcfsAvgW = 0.0, spnAvgW = 0.0, ppAvgW = 0.0;
         Dispatcher d = new Dispatcher();
         try
         {
@@ -61,13 +62,41 @@ public class A1
         d.setInput(input);
         //Run the first scheduling algorithm
         d.FCFS();
-        FCFS = d.getComplete();
         //Wrap this output in functions
-        d.outputFCS();
+        FCFS = d.outputFCS();
         //Reset the dispatcher
         d.resetDispatcher();
+        //TODO run the PRR algorithm
+        for(Process p : FCFS)
+        {
+            fcfsAvgT += p.getTat();
+            fcfsAvgW += p.getWaitTime();
+        }
+        fcfsAvgT = (fcfsAvgT / FCFS.size());
+        fcfsAvgW = (fcfsAvgW / FCFS.size());
         d.SPN();
-        d.outputSPN();
+        SPN = d.outputSPN();
         d.resetDispatcher();
+        for(Process p : SPN)
+        {
+            spnAvgT += p.getTat();
+            spnAvgW += p.getWaitTime();
+        }
+        spnAvgT = (spnAvgT / SPN.size());
+        spnAvgW = (spnAvgW / SPN.size());
+        d.PP();
+        PP = d.outputPP();
+        d.resetDispatcher();
+        for(Process p : PP)
+        {
+            ppAvgT += p.getTat();
+            ppAvgW += p.getWaitTime();
+        }
+        ppAvgT = (ppAvgT / PP.size());
+        ppAvgW = (ppAvgW / PP.size());
+        System.out.printf("\n%1.2f %1.2f", ppAvgT, ppAvgW);
+        /*System.out.println("\nSummary");
+        System.out.println("\nAlgorithm        Average Turnaround Time   Average Waiting Time");
+        System.out.println(fcfsAvg);*/
     }
 }
