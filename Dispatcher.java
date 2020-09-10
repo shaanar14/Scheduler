@@ -6,7 +6,9 @@
             execute, wait or be interrupted based on that algorithm
  */
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.NoSuchElementException;
 
 public class Dispatcher
 {
@@ -45,16 +47,21 @@ public class Dispatcher
     //Postconditions: Simulates the FCFS algorithm and calculates the necessary time values for each Process object
     public void FCFS()
     {
-        //load processes from input into waiting queue
         this.moveInput();
-        //run the dispatcher once
         this.runDispatcher();
         //for every process in the dispatcher
-        for(int i = 0; i < this.getInput().size(); i++)
+        while(this.totalTime < 24)
         {
-            this.moveWaiting();
+            this.moveInput();
+            if(!this.getWaiting().isEmpty() && this.getRunning().isEmpty())
+            {
+                this.moveWaiting();
+                this.getRunning().get(0).setStartTime(this.totalTime);
+            }
             this.runProcess();
+            //run the dispatcher for its run time and update the waiting time for any Process objects in waiting
             this.runDispatcher();
+            if(this.getComplete().size() == this.getInput().size()){break;}
         }
     }
 
@@ -74,14 +81,16 @@ public class Dispatcher
             //length of the turnaround and waiting time integer
             String t = Integer.toString(p.getTat());
             String w = Integer.toString(p.getWaitTime());
-            //number of whitespaces needed to add for turnaround and waiting time
+            //how many whitespaces we need to add for the turnaround time and waiting time
             int wsT, wsW = 16;
+            //if the turnaround is 2 digits
             if(t.length() == 2)
             {
+                wsW = 15;
                 wsT = 8;
             }
             else {wsT = 7;}
-            if(w.length() == 1){wsW = 15;}
+            if(w.length() == 2){wsW = 16;}
             String output = String.format("%s%" + wsT + "d%" + wsW + "d", p.getID(), p.getTat(), p.getWaitTime());
             System.out.println(output);
         }
@@ -93,6 +102,7 @@ public class Dispatcher
     //Preconditions: current Dispatcher object has been declared & initialized and resetDispatcher() if another algorithm has been
     //                  called and displayed
     //Postconditions: Simulates the SPN algorithm and calculates the necessary time values for each Process object
+    //TODO REWORK
     public void SPN()
     {
         //Move all Process objects in input to the waiting queue
@@ -149,6 +159,7 @@ public class Dispatcher
     //Preconditions: current Dispatcher object has been declared & initialized and resetDispatcher() if another algorithm has been
     //                  called and displayed
     //Postconditions: Simulates the PP algorithm and calculates the necessary time values for each Process object
+    //TODO REWORK
     public void PP()
     {
         //Move the processes in input
@@ -203,6 +214,21 @@ public class Dispatcher
     public void PRR()
     {
         //split Process objects into HPC and LPC
+        ArrayList<Process> HPC = new ArrayList<>();
+        ArrayList<Process> LPC = new ArrayList<>();
+        //time slices for HPC and LPC
+        int tqHPC = 4, tqLPC = 2;
+        //take the Process objects in input and categorize them by priority
+        for(Process p : this.getInput())
+        {
+            if(p.getPriority() == 0 || p.getPriority() == 1 || p.getPriority() == 2) {HPC.add(p);}
+            else if(p.getPriority() == 3 || p.getPriority() == 4 || p.getPriority() ==5) {LPC.add(p);}
+        }
+        //move all Process objects from input to waiting
+        this.moveInput();
+        this.runDispatcher();
+        //while(this.totalTime < 29)
+
     }
 
     //Moves a Process objects from waiting to running
@@ -219,35 +245,38 @@ public class Dispatcher
     //Preconditions: the current Dispatcher object has been declared and initialized
     //Postconditions: all Process objects from the input array are moved into the waiting array
     //should pass a reference to each Process object in input to waiting
-    public void moveInput() {this.waiting.addAll(this.input);}
-
-    //Run the dispatcher for however long its run time is set
-    //Preconditions: the current Dispatcher object has been declared and initialized
-    //Postconditions: runs the dispatcher for its specified run time and then updates the wait for each process in the waiting queue
-    public void runDispatcher()
+    public void moveInput()
     {
-        this.totalTime += this.getRunTime();
-        //if there are processes waiting then update their wait time
-        for(Process p : this.waiting)
+        for(Process p : this.getInput())
         {
-            p.setWaitTime(this.totalTime);
+            if(p.getArrivalTime() == this.totalTime)
+            {
+                this.waiting.add(p);
+            }
         }
     }
 
+    //Run the dispatcher for however long its run time is set
+    //Preconditions: the current Dispatcher object has been declared and initialized
+    //Postconditions: runs the dispatcher for its specified run time
+    public void runDispatcher() {this.totalTime += this.getRunTime();}
+
     //Runs one process in the running queue
     //Preconditions: the current Dispatcher object has been declared and initialized
-    //Postconditions: updates the totalTime of the Dispatcher object to be the execution time of the Process, updates that Process's complete time and then
-    //                  remove that Process object from running because it is now complete
+    //Postconditions: executes and runs the first Process object in running and once its complete, calculates it's turnaround and wait time then
+    //                  remove that Process object from running and stores it in complete
     public void runProcess()
     {
-        //Set the time the process started executing
-        this.running.get(0).setStartTime(this.totalTime);
-        //Run the process for its service time
-        this.totalTime += this.running.get(0).getServiceTime();
-        //Update the total time it took
-        this.running.get(0).setTat(this.totalTime);
-        //Remove that Process object from running as its now complete
-        this.complete.add(this.running.remove(0));
+        int execTime = this.getRunning().get(0).getServiceTime();
+        while(execTime != 0)
+        {
+            this.moveInput();
+            execTime--;
+            this.totalTime++;
+        }
+        this.getRunning().get(0).setTat(this.totalTime);
+        this.getRunning().get(0).setWaitTime();
+        this.getComplete().add(this.getRunning().remove(0));
     }
 
     //Reset the dispatcher in between each scheduling algorithm

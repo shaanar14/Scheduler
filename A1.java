@@ -15,12 +15,10 @@ public class A1
     {
         assert(args.length != 1) : "File name required";
         String fileName = args[0];
-        ArrayList<Process> input = new ArrayList<>();
-        ArrayList<Process> FCFS = new ArrayList<>();
-        ArrayList<Process> SPN = new ArrayList<>();
-        ArrayList<Process> PP = new ArrayList<>();
-        double fcfsAvgT = 0.0, spnAvgT = 0.0, ppAvgT = 0.0, fcfsAvgW = 0.0, spnAvgW = 0.0, ppAvgW = 0.0;
         Dispatcher d = new Dispatcher();
+        ArrayList<Process> input = new ArrayList<>();
+        ArrayList<Process> FCFS, SPN, PP;
+        double fcfsAvgT = 0.0, spnAvgT = 0.0, ppAvgT = 0.0, fcfsAvgW = 0.0, spnAvgW = 0.0, ppAvgW = 0.0;
         try
         {
             File f = new File(fileName);
@@ -67,7 +65,7 @@ public class A1
         //Reset the dispatcher
         d.resetDispatcher();
         //TODO run the PRR algorithm
-        for(Process p : FCFS)
+        /*for(Process p : FCFS)
         {
             fcfsAvgT += p.getTat();
             fcfsAvgW += p.getWaitTime();
@@ -94,7 +92,7 @@ public class A1
         }
         ppAvgT = (ppAvgT / PP.size());
         ppAvgW = (ppAvgW / PP.size());
-        System.out.printf("\n%1.2f %1.2f", ppAvgT, ppAvgW);
+        System.out.printf("\n%1.2f %1.2f", ppAvgT, ppAvgW);*/
         /*System.out.println("\nSummary");
         System.out.println("\nAlgorithm        Average Turnaround Time   Average Waiting Time");
         System.out.println(fcfsAvg);*/

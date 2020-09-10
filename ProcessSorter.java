@@ -13,10 +13,7 @@ public class ProcessSorter
     public static class serviceTimeSort implements Comparator<Process>
     {
         @Override
-        public int compare(Process p1, Process p2)
-        {
-            return Integer.compare(p1.getServiceTime(), p2.getServiceTime());
-        }
+        public int compare(Process p1, Process p2) {return Integer.compare(p1.getServiceTime(), p2.getServiceTime());}
     }
 
     //Allows Process objects to be sorted by their respective priority where 0 is the highest and 5 is the lowest priority
@@ -25,14 +22,8 @@ public class ProcessSorter
         @Override
         public int compare(Process p1, Process p2)
         {
-            if(p1.getPriority() > p2.getPriority())
-            {
-                return 1;
-            }
-            else if(p1.getPriority() < p2.getPriority())
-            {
-                return -1;
-            }
+            if(p1.getPriority() > p2.getPriority()) {return 1;}
+            if(p1.getPriority() < p2.getPriority()) {return -1;}
             return 0;
         }
     }
@@ -40,9 +31,6 @@ public class ProcessSorter
     public static class IDSort implements Comparator<Process>
     {
         @Override
-        public int compare(Process p1, Process p2)
-        {
-            return Character.compare(p1.getID().charAt(1), p2.getID().charAt(1));
-        }
+        public int compare(Process p1, Process p2) {return Character.compare(p1.getID().charAt(1), p2.getID().charAt(1));}
     }
 }
