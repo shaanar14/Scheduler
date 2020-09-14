@@ -19,13 +19,16 @@ public class Process implements Comparable<Process>
     private int startTime;
     //The total amount of execution/service time for the process
     private int serviceTime;
+    //How long a process has been executed for, mostly to assist with interupts
+    private int serviceCount;
     //The priority of the process
     private int priority;
     //The turnaround time of the process calculated by the time it left the system - arrival time
     private int tat;
     //The total waiting time calculated by turnaround time - service time
     private int waitTime;
-    //Maybe one for if the process is ready or blocked or maybe one for the normalized turnaround time
+    //Time slice of the priority if its required for an algorithm
+    private int timeSlice;
 
     //Default Constructor
     public Process()
@@ -34,22 +37,12 @@ public class Process implements Comparable<Process>
         this.arrivalTime = 0;
         this.startTime = 0;
         this.serviceTime = 0;
+        this.serviceCount = 0;
         //default priority is the lowest priority which is 5
         this.priority = 5;
         this.tat = 0;
         this.waitTime = 0;
-    }
-
-    //Parameter Constructor
-    public Process(String id, int arrival, int start, int service, int p, int turnaround, int wait)
-    {
-        this.ID = id;
-        this.arrivalTime = arrival;
-        this.startTime = start;
-        this.serviceTime = service;
-        this.priority = p;
-        this.tat = turnaround;
-        this.waitTime = wait;
+        this.timeSlice = 0;
     }
 
     //Setters
@@ -75,12 +68,24 @@ public class Process implements Comparable<Process>
     public void setServiceTime(int service) {this.serviceTime = service;}
 
     //Preconditions: None
-    //Postconditions: the turnaround time for the Process object is calculated and updated
+    //Postconditions: Assigns the value of time to the private member variable serviceCount
+    public void setServiceCount(int time) {this.serviceCount = time;}
+
+    //Preconditions: None
+    //Postconditions: Increments serviceCount
+    public void incServiceCount() {this.serviceCount++;}
+
+    //Preconditions: None
+    //Postconditions: The turnaround time for the Process object is calculated and updated
     public void setTat(int timeCompleted) {this.tat = timeCompleted - this.getArrivalTime();}
 
     //Preconditions: None
-    //Postconditions: the wait time of the process object is calculated
+    //Postconditions: The wait time of the process object is calculated
     public void setWaitTime() {this.waitTime = (this.getTat() - this.getServiceTime());}
+
+    //Preconditions: none
+    //Postconditions: Assigns the value of ts to the private member variable timeSlice
+    public void setTimeSlice(int ts) {this.timeSlice = ts;}
 
     //Getters
     
@@ -95,16 +100,20 @@ public class Process implements Comparable<Process>
     //Preconditions: None
     //Postconditions: Returns the time in which the Process object started running
     public int getStartTime() {return startTime;}
-    
+
     //Preconditions: None
     //Postconditions: Returns the priority of the Process object
     public int getPriority() {return priority;}
     
     //Preconditions: None
-    //Postconditions: Returns how long the Process object takes to execute
+    //Postconditions: Returns the total time a Process objects takes to execute
     public int getServiceTime() {return serviceTime;}
 
-    //Preconditions:
+    //Preconditions: None
+    //Postconditions: Returns how long the process has been executed for
+    public int getServiceCount() {return this.serviceCount;}
+
+    //Preconditions: None
     //Postconditions: Returns the turnaround time of the Process object
     public int getTat() {return tat;}
     
@@ -112,14 +121,9 @@ public class Process implements Comparable<Process>
     //Postconditions: Returns the total time the Process object has waited
     public int getWaitTime() {return waitTime;}
 
-    //Override toString for output
-    @Override
-    public String toString()
-    {
-        String output = "";
-        output = "ID: " + this.getID() + " Arrive: " +this.getArrivalTime() + " Service: " + this.getServiceTime() + " Priority: " + this.getPriority();
-        return output;
-    }
+    //Preconditions: None
+    //Postconditions: Returns the time slice/quantum of the process
+    public int getTimeSlice(){return timeSlice;}
 
     //So far only used for when we use SPN
     @Override
