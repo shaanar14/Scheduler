@@ -1,1 +1,3 @@
-Operating Systems assignment which was to implement and simulate scheduling algorithms.
+Operating Systems Assignment 1
+
+Simulation of the scheduling algorithms.
